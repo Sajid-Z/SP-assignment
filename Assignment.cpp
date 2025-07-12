@@ -205,6 +205,8 @@ void viewAccount(){
 
 void deposit(){
 
+    FILE *sptr = fopen("Transactions.bin", "ab");
+
     printf("Enter Account Number: ");
     scanf("%d", &person.accountNumber);
 
@@ -257,10 +259,19 @@ void deposit(){
         printf("%s\n", outs);
     }*/
 
+    char message[100];
+    sprintf(message, "Transaction done, BDT-%.2f deposited to %d\n", Deposit_money, person.accountNumber);
+
+    fwrite(message, sizeof(char), strlen(message), sptr);
+
     fclose(bptr);
+    fclose(sptr);
 }
 
 void withdraw(){
+
+    FILE *sptr = fopen("Transactions.bin", "ab");
+
     printf("Enter Account Number: ");
     scanf("%d", &person.accountNumber);
 
@@ -282,7 +293,7 @@ void withdraw(){
         printf("You Have no account!! Create Account First");
         return;
     }
-    float Current_money = 0, Deposit_money = 0;
+    float Current_money = 0, withdrawn_money = 0;
     fread(&Current_money, sizeof(float), 1, bptr);
 
     //fscanf(bptr, "Account Balance: %f\n", &Current_money);
@@ -293,14 +304,14 @@ void withdraw(){
     char outs[50];
    
     printf("How Much you want To Withdraw?: ");
-    scanf("%f", &Deposit_money);
+    scanf("%f", &withdrawn_money);
 
-    if(Deposit_money>Current_money){
+    if(withdrawn_money>Current_money){
         printf("Insufficient balance\n");
         return;
     }
 
-    Current_money-=Deposit_money;
+    Current_money-=withdrawn_money;
 
     FILE *fptr = fopen(balance, "wb");
 
@@ -317,7 +328,13 @@ void withdraw(){
     float display_money;
     fread(&display_money, sizeof(float), 1, bptr);
     printf("Account Balance: %f", display_money);
+
+    char message[100];
+    sprintf(message, "Transaction done, BDT-%.2f withdrawn from %d\n", withdrawn_money, person.accountNumber);
+
+    fwrite(message, sizeof(char), strlen(message), sptr);
     fclose(bptr);
+    fclose(sptr);
 }
 
 void listAccounts(){
